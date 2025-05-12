@@ -26,11 +26,12 @@
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent ()
+        private void InitializeComponent()
         {
             labelVersionStatus = new Label();
             btnFtpUpdate = new Button();
             helpProvider1 = new HelpProvider();
+            buttonDatabaseUpdate = new Button();
             SuspendLayout();
             // 
             // labelVersionStatus
@@ -55,12 +56,23 @@
             btnFtpUpdate.UseVisualStyleBackColor = true;
             btnFtpUpdate.Click += btnFtpUpdate_Click;
             // 
+            // buttonDatabaseUpdate
+            // 
+            buttonDatabaseUpdate.Location = new Point(125, 10);
+            buttonDatabaseUpdate.Name = "buttonDatabaseUpdate";
+            buttonDatabaseUpdate.Size = new Size(113, 23);
+            buttonDatabaseUpdate.TabIndex = 2;
+            buttonDatabaseUpdate.Text = "Database update";
+            buttonDatabaseUpdate.UseVisualStyleBackColor = true;
+            buttonDatabaseUpdate.Click += buttonDatabaseUpdate_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.Info;
+            BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(365, 131);
+            Controls.Add(buttonDatabaseUpdate);
             Controls.Add(btnFtpUpdate);
             Controls.Add(labelVersionStatus);
             Margin = new Padding(2);
@@ -76,5 +88,6 @@
         private Label labelVersionStatus;
         private Button btnFtpUpdate;
         private HelpProvider helpProvider1;
+        private Button buttonDatabaseUpdate;
     }
 }

@@ -1,9 +1,8 @@
 ﻿using FluentFTP;
+using Microsoft.EntityFrameworkCore;
 using System.Configuration;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
 using System.Diagnostics;
+using System.Net;
 
 namespace WinformDemoApp
 {
@@ -18,19 +17,44 @@ namespace WinformDemoApp
             _ftpBaseUrl = ConfigurationManager.AppSettings["FtpUrl"] ?? "ftp://localhost";
         }
 
-        public bool CheckForUpdates()
+        public async Task<string?> CheckForUpdates(UpdateSource updateSource)
         {
             try
             {
-                // Get version from server and compare with current
-                string serverVersion = GetVersionFromFtp();
-                return !string.IsNullOrEmpty(serverVersion) && serverVersion != CurrentVersion;
+                var newVersion = string.Empty;
+                if (updateSource is UpdateSource.FTP)
+                {
+                    newVersion = GetVersionFromFtp();
+                }
+                else
+                {
+                    newVersion = await GetVersionFromDatabase();
+                }
+
+
+                return (!string.IsNullOrEmpty(newVersion) && CurrentVersion.Trim() == newVersion.Trim()) ? null : newVersion;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error checking for updates: {ex.Message}");
-                return false;
+                return null;
             }
+        }
+
+        private static async Task<string?> GetVersionFromDatabase()
+        {
+            try
+            {
+                using var context = new DatabaseContext();
+                var appVersion = await context.AppVersions.FirstOrDefaultAsync(default);
+                // Ensure we trim any whitespace from database version
+                return appVersion?.Version?.Trim() ?? null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not connect to server: {ex.Message}");
+            }
+            return null;
         }
 
         private string GetVersionFromFtp()
@@ -52,9 +76,10 @@ namespace WinformDemoApp
 
                 if (status == FtpStatus.Success)
                 {
-                    string version = File.ReadAllText(tempFilePath);
+                    // Ensure we trim any whitespace or newlines
+                    string version = File.ReadAllText(tempFilePath).Trim();
                     File.Delete(tempFilePath);
-                    return version.Trim();
+                    return version;
                 }
 
                 return string.Empty;
@@ -66,12 +91,10 @@ namespace WinformDemoApp
             }
         }
 
-        public void DownloadAndInstallUpdate()
+        public void DownloadAndInstallUpdate(string? newVersion)
         {
             try
             {
-                // Get new version
-                string newVersion = GetVersionFromFtp();
                 if (string.IsNullOrEmpty(newVersion)) return;
                 
                 // Connect to FTP
