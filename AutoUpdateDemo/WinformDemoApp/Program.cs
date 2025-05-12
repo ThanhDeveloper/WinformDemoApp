@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace WinformDemoApp
 {
     internal static class Program
@@ -10,8 +8,6 @@ namespace WinformDemoApp
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             
             // Read version from file if exists
